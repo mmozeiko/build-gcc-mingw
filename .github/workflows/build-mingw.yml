@@ -1,0 +1,78 @@
+
+name: build-mingw
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    steps:
+
+      - name: checkout
+        uses: actions/checkout@v2          
+
+      - name: install dependencies
+        run: |
+          sudo apt-get install --no-install-recommends -y \
+            ca-certificates \
+            libgmp-dev      \
+            libmpc-dev      \
+            libmpfr-dev     \
+            libisl-dev      \
+            xz-utils        \
+            texinfo         \
+            patch           \
+            p7zip           \
+            cmake           \
+            make            \
+            curl            \
+            m4              \
+            gcc             \
+            g++
+
+      - name: build 32-bit
+        id: build32
+        run: ./build.sh 32
+
+      - name: build 64-bit
+        id: build64
+        run: ./build.sh 64
+        
+      - name: release
+        id: release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.build64.outputs.RELEASE_NAME }}
+          release_name: ${{ steps.build64.outputs.RELEASE_NAME }}
+          body: |
+            GCC v${{ steps.build64.outputs.GCC_VERSION }}
+            MinGW-w64 v${{ steps.build64.outputs.MINGW_VERSION }}
+            GDB v${{ steps.build64.outputs.GDB_VERSION }}
+            Make v${{ steps.build64.outputs.MAKE_VERSION }}
+
+      - name: upload 32-bit
+        id: upload32
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.release.outputs.upload_url }}
+          asset_path: ./${{ steps.build32.outputs.OUTPUT_BINARY }}
+          asset_name: ${{ steps.build32.outputs.OUTPUT_BINARY }}
+          asset_content_type: application/x-7z-compressed
+
+      - name: upload 64-bit
+        id: upload64
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.release.outputs.upload_url }}
+          asset_path: ./${{ steps.build64.outputs.OUTPUT_BINARY }}
+          asset_name: ${{ steps.build64.outputs.OUTPUT_BINARY }}
+          asset_content_type: application/x-7z-compressed
