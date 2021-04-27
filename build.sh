@@ -9,10 +9,10 @@ MPC_VERSION=1.2.1
 ISL_VERSION=0.23
 EXPAT_VERSION=2.3.0
 BINUTILS_VERSION=2.36.1
-GCC_VERSION=10.3.0
+GCC_VERSION=11.1.0
 MINGW_VERSION=8.0.0
 MAKE_VERSION=4.2.1
-GDB_VERSION=10.1
+GDB_VERSION=10.2
 
 ARG=${1:-64}
 if [ "${ARG}" == "32" ]; then
@@ -83,7 +83,10 @@ get https://sourceforge.net/projects/mingw-w64/files/mingw-w64/mingw-w64-release
 get https://ftp.gnu.org/gnu/gdb/gdb-${GDB_VERSION}.tar.xz
 get https://ftp.gnu.org/gnu/make/make-${MAKE_VERSION}.tar.bz2
 
-patch -N -p0 -d ${SOURCE}/gcc-${GCC_VERSION} < "$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"/gcc.patch || true
+FOLDER="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+
+patch -N -p0 -d ${SOURCE}/gcc-${GCC_VERSION}          < ${FOLDER}/gcc.patch   || true
+patch -N -p0 -d ${SOURCE}/mingw-w64-v${MINGW_VERSION} < ${FOLDER}/mingw.patch || true
 
 mkdir -p ${BUILD}/x-binutils && pushd ${BUILD}/x-binutils
 ${SOURCE}/binutils-${BINUTILS_VERSION}/configure \
