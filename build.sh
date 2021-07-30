@@ -2,14 +2,14 @@
 
 set -eux
 
-ZSTD_VERSION=1.4.9
+ZSTD_VERSION=1.5.0
 GMP_VERSION=6.2.1
 MPFR_VERSION=4.1.0
 MPC_VERSION=1.2.1
 ISL_VERSION=0.23
-EXPAT_VERSION=2.3.0
-BINUTILS_VERSION=2.36.1
-GCC_VERSION=11.1.0
+EXPAT_VERSION=2.4.1
+BINUTILS_VERSION=2.37
+GCC_VERSION=11.2.0
 MINGW_VERSION=8.0.0
 MAKE_VERSION=4.2.1
 GDB_VERSION=10.2
@@ -85,8 +85,11 @@ get https://ftp.gnu.org/gnu/make/make-${MAKE_VERSION}.tar.bz2
 
 FOLDER="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 
-patch -N -p0 -d ${SOURCE}/gcc-${GCC_VERSION}          < ${FOLDER}/gcc.patch   || true
-patch -N -p0 -d ${SOURCE}/mingw-w64-v${MINGW_VERSION} < ${FOLDER}/mingw.patch || true
+curl -Lo ${SOURCE}/binutils-999566402e.patch "https://sourceware.org/git/?p=binutils-gdb.git;a=patch;h=999566402e"
+
+patch -N -p0 -d ${SOURCE}/gcc-${GCC_VERSION}           < ${FOLDER}/gcc.patch                 || true
+patch -N -p0 -d ${SOURCE}/mingw-w64-v${MINGW_VERSION}  < ${FOLDER}/mingw.patch               || true
+patch -N -p1 -d ${SOURCE}/binutils-${BINUTILS_VERSION} < ${SOURCE}/binutils-999566402e.patch || true
 
 mkdir -p ${BUILD}/x-binutils && pushd ${BUILD}/x-binutils
 ${SOURCE}/binutils-${BINUTILS_VERSION}/configure \
