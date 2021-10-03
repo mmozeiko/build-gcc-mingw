@@ -6,13 +6,13 @@ ZSTD_VERSION=1.5.0
 GMP_VERSION=6.2.1
 MPFR_VERSION=4.1.0
 MPC_VERSION=1.2.1
-ISL_VERSION=0.23
+ISL_VERSION=0.24
 EXPAT_VERSION=2.4.1
 BINUTILS_VERSION=2.37
 GCC_VERSION=11.2.0
-MINGW_VERSION=8.0.0
+MINGW_VERSION=9.0.0
 MAKE_VERSION=4.2.1
-GDB_VERSION=10.2
+GDB_VERSION=11.1
 
 ARG=${1:-64}
 if [ "${ARG}" == "32" ]; then
@@ -75,7 +75,9 @@ get https://github.com/facebook/zstd/releases/download/v${ZSTD_VERSION}/zstd-${Z
 get https://ftp.gnu.org/gnu/gmp/gmp-${GMP_VERSION}.tar.xz
 get https://ftp.gnu.org/gnu/mpfr/mpfr-${MPFR_VERSION}.tar.xz
 get https://ftp.gnu.org/gnu/mpc/mpc-${MPC_VERSION}.tar.gz
-get http://isl.gforge.inria.fr/isl-${ISL_VERSION}.tar.xz
+# isl main site is often down
+#get http://isl.gforge.inria.fr/isl-${ISL_VERSION}.tar.xz
+get https://mirrors.kernel.org/slackware/slackware64-current/source/l/isl/isl-${ISL_VERSION}.tar.xz
 get https://github.com/libexpat/libexpat/releases/download/R_${EXPAT_VERSION//./_}/expat-${EXPAT_VERSION}.tar.xz
 get https://ftp.gnu.org/gnu/binutils/binutils-${BINUTILS_VERSION}.tar.xz
 get https://ftp.gnu.org/gnu/gcc/gcc-${GCC_VERSION}/gcc-${GCC_VERSION}.tar.xz
@@ -88,7 +90,6 @@ FOLDER="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 curl -Lo ${SOURCE}/binutils-999566402e.patch "https://sourceware.org/git/?p=binutils-gdb.git;a=patch;h=999566402e"
 
 patch -N -p0 -d ${SOURCE}/gcc-${GCC_VERSION}           < ${FOLDER}/gcc.patch                 || true
-patch -N -p0 -d ${SOURCE}/mingw-w64-v${MINGW_VERSION}  < ${FOLDER}/mingw.patch               || true
 patch -N -p1 -d ${SOURCE}/binutils-${BINUTILS_VERSION} < ${SOURCE}/binutils-999566402e.patch || true
 
 mkdir -p ${BUILD}/x-binutils && pushd ${BUILD}/x-binutils
@@ -328,6 +329,7 @@ ${SOURCE}/gdb-${GDB_VERSION}/configure \
   --disable-werror                     \
   --with-mpfr                          \
   --with-expat                         \
+  --with-libgmp-prefix=${PREFIX}       \
   --with-libmpfr-prefix=${PREFIX}      \
   --with-libexpat-prefix=${PREFIX}
 make -j`nproc`
