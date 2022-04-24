@@ -2,17 +2,17 @@
 
 set -eux
 
-ZSTD_VERSION=1.5.0
+ZSTD_VERSION=1.5.2
 GMP_VERSION=6.2.1
 MPFR_VERSION=4.1.0
 MPC_VERSION=1.2.1
 ISL_VERSION=0.24
-EXPAT_VERSION=2.4.1
-BINUTILS_VERSION=2.37
-GCC_VERSION=11.2.0
-MINGW_VERSION=9.0.0
+EXPAT_VERSION=2.4.8
+BINUTILS_VERSION=2.38
+GCC_VERSION=11.3.0
+MINGW_VERSION=10.0.0
 MAKE_VERSION=4.2.1
-GDB_VERSION=11.1
+GDB_VERSION=11.2
 
 ARG=${1:-64}
 if [ "${ARG}" == "32" ]; then
@@ -75,9 +75,7 @@ get https://github.com/facebook/zstd/releases/download/v${ZSTD_VERSION}/zstd-${Z
 get https://ftp.gnu.org/gnu/gmp/gmp-${GMP_VERSION}.tar.xz
 get https://ftp.gnu.org/gnu/mpfr/mpfr-${MPFR_VERSION}.tar.xz
 get https://ftp.gnu.org/gnu/mpc/mpc-${MPC_VERSION}.tar.gz
-# isl main site is often down
-#get http://isl.gforge.inria.fr/isl-${ISL_VERSION}.tar.xz
-get https://mirrors.kernel.org/slackware/slackware64-current/source/l/isl/isl-${ISL_VERSION}.tar.xz
+get https://libisl.sourceforge.io/isl-${ISL_VERSION}.tar.xz
 get https://github.com/libexpat/libexpat/releases/download/R_${EXPAT_VERSION//./_}/expat-${EXPAT_VERSION}.tar.xz
 get https://ftp.gnu.org/gnu/binutils/binutils-${BINUTILS_VERSION}.tar.xz
 get https://ftp.gnu.org/gnu/gcc/gcc-${GCC_VERSION}/gcc-${GCC_VERSION}.tar.xz
@@ -86,11 +84,6 @@ get https://ftp.gnu.org/gnu/gdb/gdb-${GDB_VERSION}.tar.xz
 get https://ftp.gnu.org/gnu/make/make-${MAKE_VERSION}.tar.bz2
 
 FOLDER="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
-
-curl -Lo ${SOURCE}/binutils-999566402e.patch "https://sourceware.org/git/?p=binutils-gdb.git;a=patch;h=999566402e"
-
-patch -N -p0 -d ${SOURCE}/gcc-${GCC_VERSION}           < ${FOLDER}/gcc.patch                 || true
-patch -N -p1 -d ${SOURCE}/binutils-${BINUTILS_VERSION} < ${SOURCE}/binutils-999566402e.patch || true
 
 mkdir -p ${BUILD}/x-binutils && pushd ${BUILD}/x-binutils
 ${SOURCE}/binutils-${BINUTILS_VERSION}/configure \
@@ -266,6 +259,7 @@ ${SOURCE}/mingw-w64-v${MINGW_VERSION}/mingw-w64-headers/configure \
   --host=${TARGET}
 make -j`nproc`
 make install
+ln -sTf ${FINAL}/${TARGET} ${FINAL}/mingw
 popd
 
 mkdir -p ${BUILD}/mingw-w64-crt && pushd ${BUILD}/mingw-w64-crt
@@ -357,6 +351,7 @@ find ${FINAL} -name '*.dll' -print0 | xargs -0 -n 8 -P 2 ${TARGET}-strip --strip
 find ${FINAL} -name '*.o'   -print0 | xargs -0 -n 8 -P 2 ${TARGET}-strip --strip-unneeded
 find ${FINAL} -name '*.a'   -print0 | xargs -0 -n 8 -P `nproc` ${TARGET}-strip --strip-unneeded
 
+rm ${FINAL}/mingw
 7zr a -mx9 -mqs=on -mmt=on ${OUTPUT}/${NAME}.7z ${FINAL}
 
 if [[ -v GITHUB_WORKFLOW ]]; then
