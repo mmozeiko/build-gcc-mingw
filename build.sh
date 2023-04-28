@@ -2,17 +2,17 @@
 
 set -eux
 
-ZSTD_VERSION=1.5.2
+ZSTD_VERSION=1.5.5
 GMP_VERSION=6.2.1
-MPFR_VERSION=4.1.0
-MPC_VERSION=1.2.1
-ISL_VERSION=0.25
-EXPAT_VERSION=2.4.8
-BINUTILS_VERSION=2.39
-GCC_VERSION=12.2.0
+MPFR_VERSION=4.2.0
+MPC_VERSION=1.3.1
+ISL_VERSION=0.26
+EXPAT_VERSION=2.5.0
+BINUTILS_VERSION=2.40
+GCC_VERSION=13.1.0
 MINGW_VERSION=10.0.0
 MAKE_VERSION=4.2.1
-GDB_VERSION=12.1
+GDB_VERSION=13.1
 
 ARG=${1:-64}
 if [ "${ARG}" == "32" ]; then
@@ -327,7 +327,7 @@ ${SOURCE}/gdb-${GDB_VERSION}/configure \
   --with-libmpfr-prefix=${PREFIX}      \
   --with-libexpat-prefix=${PREFIX}
 make -j`nproc`
-cp gdb/gdb.exe gdbserver/gdbserver.exe ${FINAL}/bin/
+cp gdb/.libs/gdb.exe gdbserver/gdbserver.exe ${FINAL}/bin/
 popd
 
 mkdir -p ${BUILD}/make && pushd ${BUILD}/make
