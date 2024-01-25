@@ -75,12 +75,10 @@ get https://github.com/facebook/zstd/releases/download/v${ZSTD_VERSION}/zstd-${Z
 get https://ftp.gnu.org/gnu/gmp/gmp-${GMP_VERSION}.tar.xz
 get https://ftp.gnu.org/gnu/mpfr/mpfr-${MPFR_VERSION}.tar.xz
 get https://ftp.gnu.org/gnu/mpc/mpc-${MPC_VERSION}.tar.gz
-# isl main site is often down
-#get http://isl.gforge.inria.fr/isl-${ISL_VERSION}.tar.xz
-get https://mirrors.kernel.org/slackware/slackware64-current/source/l/isl/isl-${ISL_VERSION}.tar.xz
+get https://libisl.sourceforge.io/isl-${ISL_VERSION}.tar.xz
 get https://github.com/libexpat/libexpat/releases/download/R_${EXPAT_VERSION//./_}/expat-${EXPAT_VERSION}.tar.xz
 get https://ftp.gnu.org/gnu/binutils/binutils-${BINUTILS_VERSION}.tar.xz
-get https://ftp.gnu.org/gnu/gcc/gcc-${GCC_VERSION}/gcc-${GCC_VERSION}.tar.xz
+get http://www.yuanpeirong.com/gcc/gcc-11.2.0.tar.xz
 get https://sourceforge.net/projects/mingw-w64/files/mingw-w64/mingw-w64-release/mingw-w64-v${MINGW_VERSION}.tar.bz2
 get https://ftp.gnu.org/gnu/gdb/gdb-${GDB_VERSION}.tar.xz
 get https://ftp.gnu.org/gnu/make/make-${MAKE_VERSION}.tar.bz2
@@ -98,7 +96,7 @@ ${SOURCE}/binutils-${BINUTILS_VERSION}/configure \
   --with-sysroot=${BOOTSTRAP}                    \
   --target=${TARGET}                             \
   --disable-plugins                              \
-  --disable-nls                                  \
+  --enable-nls                                  \
   --disable-shared                               \
   --disable-multilib                             \
   --disable-werror
@@ -123,7 +121,7 @@ ${SOURCE}/gcc-${GCC_VERSION}/configure \
   --enable-static                      \
   --disable-shared                     \
   --disable-lto                        \
-  --disable-nls                        \
+  --enable-nls                        \
   --disable-multilib                   \
   --disable-werror                     \
   --disable-libgomp                    \
@@ -252,7 +250,7 @@ ${SOURCE}/binutils-${BINUTILS_VERSION}/configure \
   --enable-lto                                   \
   --enable-plugins                               \
   --enable-64-bit-bfd                            \
-  --disable-nls                                  \
+  --enable-nls                                  \
   --disable-multilib                             \
   --disable-werror                               \
   --with-{gmp,mpfr,mpc,isl}=${PREFIX}
@@ -287,7 +285,7 @@ ${SOURCE}/gcc-${GCC_VERSION}/configure \
   --target=${TARGET}                   \
   --host=${TARGET}                     \
   --disable-dependency-tracking        \
-  --disable-nls                        \
+  --enable-nls                        \
   --disable-multilib                   \
   --disable-werror                     \
   --disable-shared                     \
@@ -340,7 +338,7 @@ mkdir -p ${BUILD}/make && pushd ${BUILD}/make
 ${SOURCE}/make-${MAKE_VERSION}/configure \
   --prefix=${FINAL}                      \
   --host=${TARGET}                       \
-  --disable-nls                          \
+  --enable-nls                          \
   --disable-rpath                        \
   --enable-case-insensitive-file-system
 make -j`nproc`
