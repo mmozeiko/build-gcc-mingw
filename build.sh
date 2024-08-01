@@ -9,20 +9,18 @@ MPC_VERSION=1.3.1
 ISL_VERSION=0.26
 EXPAT_VERSION=2.6.2
 BINUTILS_VERSION=2.42
-GCC_VERSION=14.1.0
-MINGW_VERSION=11.0.1
-MAKE_VERSION=4.2.1
-GDB_VERSION=14.2
+GCC_VERSION=14.2.0
+MINGW_VERSION=12.0.0
+MAKE_VERSION=4.4.1
+GDB_VERSION=15.1
 
-ARG=${1:-64}
-if [ "${ARG}" == "32" ]; then
-  NAME=gcc-v${GCC_VERSION}-mingw-v${MINGW_VERSION}-i686
-  TARGET=i686-w64-mingw32
+ARCH=${1:-x86_64}
+NAME=gcc-v${GCC_VERSION}-mingw-v${MINGW_VERSION}-${ARCH}
+TARGET=${ARCH}-w64-mingw32
+if [ "${ARCH}" == "i686" ]; then
   EXTRA_CRT_ARGS=--disable-lib64
   EXTRA_GCC_ARGS="--disable-sjlj-exceptions --with-dwarf2"
-elif [ "${ARG}" == "64" ]; then
-  NAME=gcc-v${GCC_VERSION}-mingw-v${MINGW_VERSION}-x86_64
-  TARGET=x86_64-w64-mingw32
+elif [ "${ARCH}" == "x86_64" ]; then
   EXTRA_CRT_ARGS=--disable-lib32
   EXTRA_GCC_ARGS=
 else
@@ -81,7 +79,7 @@ get https://ftp.gnu.org/gnu/binutils/binutils-${BINUTILS_VERSION}.tar.xz
 get https://ftp.gnu.org/gnu/gcc/gcc-${GCC_VERSION}/gcc-${GCC_VERSION}.tar.xz
 get https://sourceforge.net/projects/mingw-w64/files/mingw-w64/mingw-w64-release/mingw-w64-v${MINGW_VERSION}.tar.bz2
 get https://ftp.gnu.org/gnu/gdb/gdb-${GDB_VERSION}.tar.xz
-get https://ftp.gnu.org/gnu/make/make-${MAKE_VERSION}.tar.bz2
+get https://ftp.gnu.org/gnu/make/make-${MAKE_VERSION}.tar.gz
 
 curl -Lsf "https://sourceware.org/git/?p=binutils-gdb.git;a=patch;h=45e83f865876e42d22cf4bc242725bb4a25a12e3" | patch -t -N -p1 -d ${SOURCE}/gdb-${GDB_VERSION} || true
 
@@ -355,12 +353,9 @@ find ${FINAL} -name '*.a'   -print0 | xargs -0 -n 8 -P `nproc` ${TARGET}-strip -
 rm ${FINAL}/mingw
 7zr a -mx9 -mqs=on -mmt=on ${OUTPUT}/${NAME}.7z ${FINAL}
 
-if [[ -v GITHUB_WORKFLOW ]]; then
-  echo "::set-output name=GCC_VERSION::${GCC_VERSION}"
-  echo "::set-output name=MINGW_VERSION::${MINGW_VERSION}"
-  echo "::set-output name=GDB_VERSION::${GDB_VERSION}"
-  echo "::set-output name=MAKE_VERSION::${MAKE_VERSION}"
-  echo "::set-output name=OUTPUT_BINARY::${NAME}.7z"
-  echo "::set-output name=RELEASE_NAME::gcc-v${GCC_VERSION}-mingw-v${MINGW_VERSION}"
-  rm -rf "${BUILD}" "${BOOTSTRAP}" "${PREFIX}" "${FINAL}"
+if [[ -v GITHUB_OUTPUT ]]; then
+  echo "GCC_VERSION=${GCC_VERSION}"     >>${GITHUB_OUTPUT}
+  echo "MINGW_VERSION=${MINGW_VERSION}" >>${GITHUB_OUTPUT}
+  echo "GDB_VERSION=${GDB_VERSION}"     >>${GITHUB_OUTPUT}
+  echo "MAKE_VERSION=${MAKE_VERSION}"   >>${GITHUB_OUTPUT}
 fi

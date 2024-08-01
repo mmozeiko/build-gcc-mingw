@@ -12,8 +12,8 @@ To build binaries using Docker, run:
     apt update
     DEBIAN_FRONTEND=noninteractive apt install --no-install-recommends -y \
         ca-certificates libgmp-dev libmpc-dev libmpfr-dev libisl-dev xz-utils texinfo patch bzip2 p7zip cmake make curl m4 gcc g++
-    /output/build.sh 32
-    /output/build.sh 64
+    /output/build.sh i686
+    /output/build.sh x86_64
     exit
 
 [gcc]: https://gcc.gnu.org/
