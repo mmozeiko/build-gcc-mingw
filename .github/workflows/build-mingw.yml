@@ -70,7 +70,7 @@ jobs:
           echo 'MinGW-w64 v${{ needs.build.outputs.MINGW_VERSION }}' >>notes.txt
           echo 'GDB v${{ needs.build.outputs.GDB_VERSION }}'         >>notes.txt
           echo 'Make v${{ needs.build.outputs.MAKE_VERSION }}'       >>notes.txt
-          gh release create ${{ needs.build.outputs.GCC_VERSION }} -R "${GITHUB_REPOSITORY}" -t '${{ needs.build.outputs.GCC_VERSION }}' -F notes.txt
+          gh release create gcc-v${{ needs.build.outputs.GCC_VERSION }}-mingw-v${{ needs.build.outputs.MINGW_VERSION }} -R "${GITHUB_REPOSITORY}" -t 'gcc-v${{ needs.build.outputs.GCC_VERSION }}-mingw-v${{ needs.build.outputs.MINGW_VERSION }}' -F notes.txt
 
       - name: get artifacts
         uses: actions/download-artifact@v4
@@ -79,4 +79,4 @@ jobs:
           merge-multiple: true
 
       - name: upload artifacts
-        run: gh release upload '${{ needs.build.outputs.GCC_VERSION }}' gcc-v${{ needs.build.outputs.GCC_VERSION }}-mingw-v${{ needs.build.outputs.MINGW_VERSION }}-*.7z -R "${GITHUB_REPOSITORY}"
+        run: gh release upload 'gcc-v${{ needs.build.outputs.GCC_VERSION }}-mingw-v${{ needs.build.outputs.MINGW_VERSION }}' gcc-v${{ needs.build.outputs.GCC_VERSION }}-mingw-v${{ needs.build.outputs.MINGW_VERSION }}-*.7z -R "${GITHUB_REPOSITORY}"

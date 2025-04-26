@@ -2,17 +2,17 @@
 
 set -eux
 
-ZSTD_VERSION=1.5.6
+ZSTD_VERSION=1.5.7
 GMP_VERSION=6.3.0
-MPFR_VERSION=4.2.1
+MPFR_VERSION=4.2.2
 MPC_VERSION=1.3.1
 ISL_VERSION=0.26
-EXPAT_VERSION=2.6.2
-BINUTILS_VERSION=2.42
-GCC_VERSION=14.2.0
+EXPAT_VERSION=2.7.1
+BINUTILS_VERSION=2.44
+GCC_VERSION=15.1.0
 MINGW_VERSION=12.0.0
 MAKE_VERSION=4.4.1
-GDB_VERSION=15.1
+GDB_VERSION=16.3
 
 ARCH=${1:-x86_64}
 NAME=gcc-v${GCC_VERSION}-mingw-v${MINGW_VERSION}-${ARCH}
@@ -80,10 +80,6 @@ get https://ftp.gnu.org/gnu/gcc/gcc-${GCC_VERSION}/gcc-${GCC_VERSION}.tar.xz
 get https://sourceforge.net/projects/mingw-w64/files/mingw-w64/mingw-w64-release/mingw-w64-v${MINGW_VERSION}.tar.bz2
 get https://ftp.gnu.org/gnu/gdb/gdb-${GDB_VERSION}.tar.xz
 get https://ftp.gnu.org/gnu/make/make-${MAKE_VERSION}.tar.gz
-
-curl -Lsf "https://sourceware.org/git/?p=binutils-gdb.git;a=patch;h=45e83f865876e42d22cf4bc242725bb4a25a12e3" | patch -t -N -p1 -d ${SOURCE}/gdb-${GDB_VERSION} || true
-
-FOLDER="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 
 mkdir -p ${BUILD}/x-binutils && pushd ${BUILD}/x-binutils
 ${SOURCE}/binutils-${BINUTILS_VERSION}/configure \
@@ -186,7 +182,9 @@ ${SOURCE}/gmp-${GMP_VERSION}/configure \
   --host=${TARGET}                     \
   --disable-shared                     \
   --enable-static                      \
-  --enable-fat
+  --enable-fat                         \
+  CC=${TARGET}-gcc                     \
+  CFLAGS="-O2 -std=gnu17"
 make -j`nproc`
 make install
 popd
@@ -316,15 +314,17 @@ make install
 popd
 
 mkdir -p ${BUILD}/gdb && pushd ${BUILD}/gdb
-${SOURCE}/gdb-${GDB_VERSION}/configure \
-  --prefix=${FINAL}                    \
-  --host=${TARGET}                     \
-  --enable-64-bit-bfd                  \
-  --disable-werror                     \
-  --disable-source-highlight           \
-  --with-static-standard-libraries     \
-  --with-libexpat-prefix=${PREFIX}     \
-  --with-{gmp,mpfr,mpc,isl,zstd}=${PREFIX}
+${SOURCE}/gdb-${GDB_VERSION}/configure     \
+  --prefix=${FINAL}                        \
+  --host=${TARGET}                         \
+  --enable-64-bit-bfd                      \
+  --disable-werror                         \
+  --disable-source-highlight               \
+  --with-static-standard-libraries         \
+  --with-libexpat-prefix=${PREFIX}         \
+  --with-{gmp,mpfr,mpc,isl,zstd}=${PREFIX} \
+  CFLAGS="-O2 -std=gnu17"                  \
+  CXXFLAGS="-O2 -D_WIN32_WINNT=0x0600"
 make -j`nproc`
 cp gdb/.libs/gdb.exe gdbserver/gdbserver.exe ${FINAL}/bin/
 popd
@@ -335,7 +335,8 @@ ${SOURCE}/make-${MAKE_VERSION}/configure \
   --host=${TARGET}                       \
   --disable-nls                          \
   --disable-rpath                        \
-  --enable-case-insensitive-file-system
+  --enable-case-insensitive-file-system  \
+  CFLAGS="-O2 -std=gnu17"
 make -j`nproc`
 make install
 popd
