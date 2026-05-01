@@ -23,7 +23,7 @@ jobs:
     steps:
 
       - name: checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: install dependencies
         run: |
@@ -49,7 +49,7 @@ jobs:
         run: ./build.sh ${{ matrix.arch }} ${{ matrix.crt }}
 
       - name: upload artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: gcc-v${{ steps.build.outputs.GCC_VERSION }}-mingw-v${{ steps.build.outputs.MINGW_VERSION }}-${{ matrix.crt }}-${{ matrix.arch }}
           path: gcc-v${{ steps.build.outputs.GCC_VERSION }}-mingw-v${{ steps.build.outputs.MINGW_VERSION }}-${{ matrix.crt }}-${{ matrix.arch }}.7z
@@ -74,7 +74,7 @@ jobs:
           gh release create gcc-v${{ needs.build.outputs.GCC_VERSION }}-mingw-v${{ needs.build.outputs.MINGW_VERSION }} -R "${GITHUB_REPOSITORY}" -t 'gcc-v${{ needs.build.outputs.GCC_VERSION }}-mingw-v${{ needs.build.outputs.MINGW_VERSION }}' -F notes.txt
 
       - name: get artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           pattern: gcc-v${{ needs.build.outputs.GCC_VERSION }}-mingw-v${{ needs.build.outputs.MINGW_VERSION }}-*
           merge-multiple: true

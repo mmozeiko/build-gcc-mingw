@@ -11,26 +11,26 @@ GMP_SHA256=a3c2b80201b89e68616f4ad30bc66aee4927c3ce50e33929ca819d5c43538898
 MPFR_VERSION=4.2.2
 MPFR_SHA256=b67ba0383ef7e8a8563734e2e889ef5ec3c3b898a01d00fa0a6869ad81c6ce01
 
-MPC_VERSION=1.3.1
-MPC_SHA256=ab642492f5cf882b74aa0cb730cd410a81edcdbec895183ce930e706c1c759b8
+MPC_VERSION=1.4.1
+MPC_SHA256=91204cd32f164bd3b7c992d4a6a8ce6519511aadab30f78b6982d0bf8d73e931
 
-ISL_VERSION=0.26
-ISL_SHA256=a0b5cb06d24f9fa9e77b55fabbe9a3c94a336190345c2555f9915bb38e976504
+ISL_VERSION=0.27
+ISL_SHA256=6d8babb59e7b672e8cb7870e874f3f7b813b6e00e6af3f8b04f7579965643d5c
 
-EXPAT_VERSION=2.7.1
-EXPAT_SHA256=354552544b8f99012e5062f7d570ec77f14b412a3ff5c7d8d0dae62c0d217c30
+EXPAT_VERSION=2.8.0
+EXPAT_SHA256=a37bfae0aa9775bd8521ebd85dc456d486f0ff31138f6c91fd902ea732624542
 
-BINUTILS_VERSION=2.45
-BINUTILS_SHA256=c50c0e7f9cb188980e2cc97e4537626b1672441815587f1eab69d2a1bfbef5d2
+BINUTILS_VERSION=2.46.0
+BINUTILS_SHA256=d75a94f4d73e7a4086f7513e67e439e8fcdcbb726ffe63f4661744e6256b2cf2
 
-GCC_VERSION=15.2.0
-GCC_SHA256=438fd996826b0c82485a29da03a72d71d6e3541a83ec702df4271f6fe025d24e
+GCC_VERSION=16.1.0
+GCC_SHA256=50efb4d94c3397aff3b0d61a5abd748b4dd31d9d3f2ab7be05b171d36a510f79
 
-MINGW_VERSION=13.0.0
-MINGW_SHA256=5afe822af5c4edbf67daaf45eec61d538f49eef6b19524de64897c6b95828caf
+MINGW_VERSION=14.0.0
+MINGW_SHA256=6eaf921d9eb987d3820b364ea9775bc19b965ec81490b6fdd716526c28e1995c
 
-GDB_VERSION=16.3
-GDB_SHA256=bcfcd095528a987917acf9fff3f1672181694926cc18d609c99d0042c00224c5
+GDB_VERSION=17.1
+GDB_SHA256=14996f5f74c9f68f5a543fdc45bca7800207f91f92aeea6c2e791822c7c6d876
 
 MAKE_VERSION=4.4.1
 MAKE_SHA256=dd16fb1d67bfab79a72f5e8390735c49e3e8e70b4945a15ab1f81ddb78658fb3
@@ -106,7 +106,7 @@ FINAL=`pwd`/${NAME}
 get https://github.com/facebook/zstd/releases/download/v${ZSTD_VERSION}/zstd-${ZSTD_VERSION}.tar.gz                  ${ZSTD_SHA256}
 get https://ftp.gnu.org/gnu/gmp/gmp-${GMP_VERSION}.tar.xz                                                            ${GMP_SHA256}
 get https://ftp.gnu.org/gnu/mpfr/mpfr-${MPFR_VERSION}.tar.xz                                                         ${MPFR_SHA256}
-get https://ftp.gnu.org/gnu/mpc/mpc-${MPC_VERSION}.tar.gz                                                            ${MPC_SHA256}
+get https://ftp.gnu.org/gnu/mpc/mpc-${MPC_VERSION}.tar.xz                                                            ${MPC_SHA256}
 get https://libisl.sourceforge.io/isl-${ISL_VERSION}.tar.xz                                                          ${ISL_SHA256}
 get https://github.com/libexpat/libexpat/releases/download/R_${EXPAT_VERSION//./_}/expat-${EXPAT_VERSION}.tar.xz     ${EXPAT_SHA256}
 get https://ftp.gnu.org/gnu/binutils/binutils-${BINUTILS_VERSION}.tar.xz                                             ${BINUTILS_SHA256}
@@ -151,10 +151,12 @@ ${SOURCE}/gcc-${GCC_VERSION}/configure \
   --disable-multilib                   \
   --disable-werror                     \
   --disable-libgomp                    \
+  --enable-tls                         \
   --enable-languages=c,c++             \
-  --enable-threads=posix               \
+  --enable-threads=win32               \
   --enable-checking=release            \
   --enable-large-address-aware         \
+  --enable-libstdcxx-threads           \
   --disable-libstdcxx-pch              \
   --disable-libstdcxx-verbose          \
   ${EXTRA_GCC_ARGS}
@@ -322,12 +324,14 @@ ${SOURCE}/gcc-${GCC_VERSION}/configure \
   --disable-shared                     \
   --enable-static                      \
   --enable-lto                         \
+  --enable-tls                         \
   --enable-languages=c,c++,lto         \
   --enable-libgomp                     \
-  --enable-threads=posix               \
+  --enable-threads=win32               \
   --enable-checking=release            \
   --enable-mingw-wildcard              \
   --enable-large-address-aware         \
+  --enable-libstdcxx-threads           \
   --disable-libstdcxx-pch              \
   --disable-libstdcxx-verbose          \
   --disable-win32-registry             \
