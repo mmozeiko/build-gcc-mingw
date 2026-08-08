@@ -8,7 +8,7 @@ To build binaries locally run `build.sh`. Make sure you have installed all neces
 
 To build binaries using Docker, run:
 
-    podman run -ti --rm -v `pwd`:/output -e OUTPUT=/output -w /mnt ubuntu:24.04
+    podman run -ti --rm -v `pwd`:/output -e OUTPUT=/output -w /mnt ubuntu:26.04
     apt update
     DEBIAN_FRONTEND=noninteractive apt install --no-install-recommends -y \
         ca-certificates libgmp-dev libmpc-dev libmpfr-dev libisl-dev xz-utils texinfo patch bzip2 p7zip cmake make curl m4 gcc g++
